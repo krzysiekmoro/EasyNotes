@@ -25,7 +25,7 @@ exports.getTodo = (req, res) => {
 }
 
 exports.updateTodo = (req, res) => {
-    db.Todo.findByIdAndUpdate(
+    db.Todo.findOneAndUpdate(
         {_id: req.params.todoId},
         req.body
     )
