@@ -7,6 +7,15 @@ $(document).ready(() => {
             createTodo();
         }
     })
+
+    $('.list').on('click', 'li', function(){
+        upadateTodo($(this))
+    })
+
+    $('.list').on('click', 'span', function(e){
+        e.stopPropagation()
+        removeTodo($(this).parent())
+    })
 })
 
 function addTodos(todos){
@@ -16,11 +25,13 @@ function addTodos(todos){
 }
 
 function addTodo(todo){
+    let newElement = $(`<li class="task">${todo.name}<span>X</span></li>`);
+    newElement.data('id', todo._id);
+    newElement.data('completed', todo.completed);
     if(todo.completed){
-        $('.list').append(`<li class="done">${todo.name}</li>`)
-    }else{
-        $('.list').append(`<li class="task">${todo.name}</li>`)
+        newElement.addClass('done')
     }
+    $('.list').append(newElement);
 }
 
 function createTodo(){
@@ -31,4 +42,31 @@ function createTodo(){
         addTodo(newTodo);
     })
     .catch(err => console.log(err))
+}
+
+function removeTodo(todo){
+    const clickedId = todo.data('id')
+    const deleteUrl = `api/todos/${clickedId}`
+    $.ajax({
+        method: 'DELETE',
+        url: deleteUrl
+    })
+    .then((data) => {
+        todo.remove()
+    })
+}
+
+function upadateTodo(todo){
+    const updateUrl = `api/todos/${todo.data('id')}`
+    const state = !todo.data('completed')
+    const updateData = { completed: state }
+    $.ajax({
+        method: 'PUT',
+        url: updateUrl,
+        data: updateData
+    })
+    .then((updatedTodo) => {
+        todo.toggleClass('done')
+        todo.data('completed', state)
+    })
 }
